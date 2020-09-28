@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const router = express.Router();
 const LogIn = require("../db/model");
+const signUp = require("../db/model");
 
 const schema = Joi.object({
   username: Joi.string()
@@ -30,7 +31,7 @@ router.get("/", (req, res) => {
 router.post("/signup", (req, res, next) => {
   const result = schema.validate(req.body);
   if (result.error == null){
-    LogIn.findOne({
+    signUp.findOne({
       username: req.body.username
     }).then(user => {
       if (user) {
@@ -38,14 +39,13 @@ router.post("/signup", (req, res, next) => {
         next(error);
       } else {
         bcrypt.hash(req.body.password, 12).then(async hashedPassword =>{
-          const loginData = new LogIn({
+          const signupData = new signUp({
             username: req.body.username,
             password: hashedPassword
           });
     
-          const loginResult = await loginData.save();
-          res.json(loginResult);
-          console.log(loginResult);
+          const signupResult = await signupData.save();
+          res.json(signupResult);
         })
       }
     });
