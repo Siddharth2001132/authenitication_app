@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 
 const Joi = require("joi");
 const router = express.Router();
@@ -32,13 +33,26 @@ router.post("/signup", (req, res, next) => {
     LogIn.findOne({
       username: req.body.username
     }).then(user => {
-      res.json({ user })
+      if (user) {
+        const error = new Error("The username already exist!");
+        next(error);
+      } else {
+        bcrypt.hash(req.body.password, 12).then(async hashedPassword =>{
+          const loginData = new LogIn({
+            username: req.body.username,
+            password: hashedPassword
+          });
+    
+          const loginResult = await loginData.save();
+          res.json(loginResult);
+        })
+      }
     });
     
   } else {
     next(result.error);
   }
-  console.log(result);
+  // console.log(result);
 });
 
 module.exports = router;
