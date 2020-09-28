@@ -45,6 +45,7 @@ router.post("/signup", (req, res, next) => {
     
           const loginResult = await loginData.save();
           res.json(loginResult);
+          console.log(loginResult);
         })
       }
     });
